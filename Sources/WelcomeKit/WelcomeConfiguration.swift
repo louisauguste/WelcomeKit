@@ -48,8 +48,7 @@ public struct WelcomeConfiguration: @unchecked Sendable {
 
     // MARK: - Symbols
 
-    /// Point size of the SF Symbols. `nil` uses 28pt on iOS and 24pt on macOS,
-    /// matching the platform's own welcome sheets.
+    /// Point size of the SF Symbols. `nil` uses 28pt on iOS and 27pt on macOS.
     public var symbolSize: CGFloat?
 
     /// Stroke weight of the SF Symbols.
@@ -65,6 +64,11 @@ public struct WelcomeConfiguration: @unchecked Sendable {
 
     /// Font of each feature's second line. `nil` uses `.body`.
     public var featureSubtitleFont: Font?
+
+    /// Font of the button's label. `nil` uses `.headline` on iOS and 15pt medium
+    /// on macOS, where `.headline` comes out both smaller and heavier than the
+    /// same button reads on a phone.
+    public var buttonFont: Font?
 
     /// Alignment of the title. Feature rows always read from the leading edge.
     public var titleAlignment: TextAlignment
@@ -128,6 +132,7 @@ public struct WelcomeConfiguration: @unchecked Sendable {
         titleFont: Font? = nil,
         featureTitleFont: Font? = nil,
         featureSubtitleFont: Font? = nil,
+        buttonFont: Font? = nil,
         titleAlignment: TextAlignment = .leading,
         titleLineLimit: Int? = 2,
         footnote: WelcomeText? = nil,
@@ -149,6 +154,7 @@ public struct WelcomeConfiguration: @unchecked Sendable {
         self.titleFont = titleFont
         self.featureTitleFont = featureTitleFont
         self.featureSubtitleFont = featureSubtitleFont
+        self.buttonFont = buttonFont
         self.titleAlignment = titleAlignment
         self.titleLineLimit = titleLineLimit
         self.footnote = footnote
@@ -370,9 +376,10 @@ public struct WelcomeMetrics: Sendable, Equatable {
         #if os(macOS)
         WelcomeMetrics(
             compactTopPadding: 32,
+            extraBottomPadding: 46,
             actionLabelPadding: 5,
-            symbolColumnWidth: 38,
-            symbolColumnHeight: 30
+            symbolColumnWidth: 41,
+            symbolColumnHeight: 33
         )
         #else
         WelcomeMetrics()

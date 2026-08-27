@@ -226,7 +226,7 @@ public struct WelcomeView: View {
     private var continueLabel: some View {
         configuration.continueTitle
             .text(bundle: configuration.localizationBundle, tableName: configuration.localizationTable)
-            .font(.headline)
+            .font(resolvedButtonFont)
             .padding(.vertical, metrics.actionLabelPadding)
             .welcomeFlexibleLabelWidth()
     }
@@ -281,6 +281,18 @@ public struct WelcomeView: View {
         return .system(size: 26, weight: .bold)
         #else
         return .title.weight(.bold)
+        #endif
+    }
+
+    /// `.headline` is 17pt semibold on iOS and 13pt semibold on macOS, so the
+    /// same font reads as a heavier, smaller label on a Mac. 15pt medium lands
+    /// where the phone button already is.
+    private var resolvedButtonFont: Font {
+        if let font = configuration.buttonFont { return font }
+        #if os(macOS)
+        return .system(size: 15, weight: .medium)
+        #else
+        return .headline
         #endif
     }
 
@@ -443,7 +455,7 @@ private struct WelcomeFeatureRow: View {
     private var resolvedSymbolSize: CGFloat {
         if let size = configuration.symbolSize { return size }
         #if os(macOS)
-        return 24
+        return 27
         #else
         return 28
         #endif

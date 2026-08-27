@@ -100,7 +100,7 @@ configuration.footnote = "You can change this later in Settings."
 | `buttonStyle` | `.automatic`, `.prominent`, `.glass`, `.bordered`. |
 | `continueTitle`, `footnote` | The copy. Localized keys by default. |
 | `maximumFeatureCount` | Show the first N rows of a longer list. |
-| `titleFont`, `featureTitleFont`, `featureSubtitleFont` | Fonts, if the defaults are not your defaults. |
+| `titleFont`, `featureTitleFont`, `featureSubtitleFont`, `buttonFont` | Fonts, if the defaults are not your defaults. |
 | `metrics` | Every padding, width and breakpoint in the layout. |
 | `localizationBundle`, `localizationTable` | Where the keys are looked up. |
 
@@ -130,9 +130,10 @@ the top padding drops, because a sheet has no notch to clear. The check is a
 measured width *and* the iPad idiom, so an iPhone in landscape and an iPad in
 Slide Over both keep the phone numbers.
 
-**Mac** takes a 500×580 sheet with a 26pt title and 24pt symbols, caps the button
-at the same 340pt iPad uses, and pads its own bottom, since there's no home
-indicator to sit above.
+**Mac** takes a 500×580 sheet with a 26pt title and 27pt symbols, caps the button
+at the same 340pt iPad uses, sets the label in 15pt medium rather than the
+smaller, heavier `.headline` a Mac resolves that to, and pads its own bottom,
+since there's no home indicator to sit above.
 
 ## What it handles for you
 

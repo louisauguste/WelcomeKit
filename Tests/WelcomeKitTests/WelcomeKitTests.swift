@@ -61,12 +61,14 @@ struct LayoutTests {
         let metrics = WelcomeMetrics.automatic
         #if os(macOS)
         #expect(metrics.compactTopPadding == 32)
-        #expect(metrics.symbolColumnWidth == 38)
+        #expect(metrics.symbolColumnWidth == 41)
         #expect(metrics.actionLabelPadding == 5)
+        #expect(metrics.extraBottomPadding == 46)
         #else
         #expect(metrics.compactTopPadding == 84)
         #expect(metrics.symbolColumnWidth == 42)
         #expect(metrics.actionLabelPadding == 0)
+        #expect(metrics.extraBottomPadding == 34)
         #endif
     }
 }
