@@ -1,5 +1,7 @@
 # WelcomeKit
 
+[![CI](https://github.com/louisauguste/WelcomeKit/actions/workflows/ci.yml/badge.svg)](https://github.com/louisauguste/WelcomeKit/actions/workflows/ci.yml)
+
 The "Welcome to…" screen Apple opens its own apps with, as a Swift package. A big
 title, a list of features with SF Symbols beside them, a button pinned to the
 bottom. Then a reveal that assembles the whole thing one row at a time.
