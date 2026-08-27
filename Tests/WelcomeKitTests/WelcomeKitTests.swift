@@ -62,9 +62,11 @@ struct LayoutTests {
         #if os(macOS)
         #expect(metrics.compactTopPadding == 32)
         #expect(metrics.symbolColumnWidth == 38)
+        #expect(metrics.actionLabelPadding == 5)
         #else
         #expect(metrics.compactTopPadding == 84)
         #expect(metrics.symbolColumnWidth == 42)
+        #expect(metrics.actionLabelPadding == 0)
         #endif
     }
 }

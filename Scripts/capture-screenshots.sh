@@ -62,7 +62,6 @@ prepare "$PHONE"
 shoot "$PHONE" iphone-light light  -demo.tint blue   -demo.symbols monochrome   -demo.featureCount 5
 shoot "$PHONE" iphone-dark  dark   -demo.tint indigo -demo.symbols hierarchical -demo.featureCount 5
 shoot "$PHONE" iphone-pink  light  -demo.tint pink   -demo.symbols hierarchical -demo.featureCount 4 -demo.footnote YES
-shoot "$PHONE" iphone-orange dark  -demo.tint orange -demo.symbols palette      -demo.featureCount 4 -demo.secondaryAction YES
 
 echo "Capturing iPad…"
 prepare "$PAD"

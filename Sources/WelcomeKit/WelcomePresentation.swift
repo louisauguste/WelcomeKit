@@ -75,8 +75,7 @@ public extension View {
         features: [WelcomeFeature],
         configuration: WelcomeConfiguration = .default,
         presentation: WelcomePresentation = .automatic,
-        onContinue: (() -> Void)? = nil,
-        onSecondaryAction: (() -> Void)? = nil
+        onContinue: (() -> Void)? = nil
     ) -> some View {
         modifier(
             WelcomeSheetModifier(
@@ -85,8 +84,7 @@ public extension View {
                     title: title,
                     features: features,
                     configuration: configuration,
-                    onContinue: onContinue,
-                    onSecondaryAction: onSecondaryAction
+                    onContinue: onContinue
                 ),
                 presentation: presentation,
                 onDismiss: nil
@@ -121,8 +119,7 @@ public extension View {
         features: [WelcomeFeature],
         configuration: WelcomeConfiguration = .default,
         presentation: WelcomePresentation = .automatic,
-        onContinue: (() -> Void)? = nil,
-        onSecondaryAction: (() -> Void)? = nil
+        onContinue: (() -> Void)? = nil
     ) -> some View {
         modifier(
             FirstLaunchWelcomeModifier(
@@ -132,8 +129,7 @@ public extension View {
                     title: title,
                     features: features,
                     configuration: configuration,
-                    onContinue: onContinue,
-                    onSecondaryAction: onSecondaryAction
+                    onContinue: onContinue
                 ),
                 presentation: presentation
             )
@@ -148,7 +144,6 @@ struct WelcomeContent {
     let features: [WelcomeFeature]
     let configuration: WelcomeConfiguration
     let onContinue: (() -> Void)?
-    let onSecondaryAction: (() -> Void)?
 }
 
 private struct WelcomeSheetModifier: ViewModifier {
@@ -178,12 +173,6 @@ private struct WelcomeSheetModifier: ViewModifier {
             onContinue: {
                 isPresented = false
                 content.onContinue?()
-            },
-            onSecondaryAction: content.onSecondaryAction.map { action in
-                {
-                    isPresented = false
-                    action()
-                }
             }
         )
         .interactiveDismissDisabled(!presentation.isDismissible)

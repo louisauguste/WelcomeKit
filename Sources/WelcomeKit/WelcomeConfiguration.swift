@@ -89,10 +89,6 @@ public struct WelcomeConfiguration: @unchecked Sendable {
     /// Label of the primary button.
     public var continueTitle: WelcomeText
 
-    /// Label of an optional plain button under the primary one. `nil` hides it,
-    /// and so does a missing `onSecondaryAction` handler.
-    public var secondaryTitle: WelcomeText?
-
     /// Look of the primary button.
     public var buttonStyle: WelcomeButtonStyle
 
@@ -137,7 +133,6 @@ public struct WelcomeConfiguration: @unchecked Sendable {
         footnote: WelcomeText? = nil,
         maximumFeatureCount: Int? = nil,
         continueTitle: WelcomeText = .localized("Continue"),
-        secondaryTitle: WelcomeText? = nil,
         buttonStyle: WelcomeButtonStyle = .automatic,
         animation: WelcomeAnimation = .default,
         isHapticsEnabled: Bool = true,
@@ -159,7 +154,6 @@ public struct WelcomeConfiguration: @unchecked Sendable {
         self.footnote = footnote
         self.maximumFeatureCount = maximumFeatureCount
         self.continueTitle = continueTitle
-        self.secondaryTitle = secondaryTitle
         self.buttonStyle = buttonStyle
         self.animation = animation
         self.isHapticsEnabled = isHapticsEnabled
@@ -315,6 +309,11 @@ public struct WelcomeMetrics: Sendable, Equatable {
     /// Vertical padding inside the bottom bar.
     public var bottomBarVerticalPadding: CGFloat
 
+    /// Extra height inside the primary button, added around its label. iOS gets
+    /// a tall enough button from `.controlSize(.large)` alone; a Mac one comes
+    /// out thin next to the same layout on iPad.
+    public var actionLabelPadding: CGFloat
+
     /// Gap between the title and the first row.
     public var titleBottomPadding: CGFloat
 
@@ -341,6 +340,7 @@ public struct WelcomeMetrics: Sendable, Equatable {
         wideTopPadding: CGFloat = 64,
         extraBottomPadding: CGFloat = 34,
         bottomBarVerticalPadding: CGFloat = 8,
+        actionLabelPadding: CGFloat = 0,
         titleBottomPadding: CGFloat = 28,
         featureSpacing: CGFloat = 20,
         symbolSpacing: CGFloat = 12,
@@ -356,6 +356,7 @@ public struct WelcomeMetrics: Sendable, Equatable {
         self.wideTopPadding = wideTopPadding
         self.extraBottomPadding = extraBottomPadding
         self.bottomBarVerticalPadding = bottomBarVerticalPadding
+        self.actionLabelPadding = actionLabelPadding
         self.titleBottomPadding = titleBottomPadding
         self.featureSpacing = featureSpacing
         self.symbolSpacing = symbolSpacing
@@ -369,6 +370,7 @@ public struct WelcomeMetrics: Sendable, Equatable {
         #if os(macOS)
         WelcomeMetrics(
             compactTopPadding: 32,
+            actionLabelPadding: 5,
             symbolColumnWidth: 38,
             symbolColumnHeight: 30
         )

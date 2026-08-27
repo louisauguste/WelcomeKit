@@ -5,7 +5,7 @@
 
 import Foundation
 
-/// The flag behind ``SwiftUICore/View/welcomeSheetOnFirstLaunch(id:store:title:features:configuration:presentation:onContinue:onSecondaryAction:)``.
+/// The flag behind ``SwiftUICore/View/welcomeSheetOnFirstLaunch(id:store:title:features:configuration:presentation:onContinue:)``.
 ///
 /// Read it to branch on whether the welcome screen has run, or reset it to make
 /// it run again — after a big update, or from a debug menu.

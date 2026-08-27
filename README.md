@@ -13,7 +13,7 @@ Two lines to show it on first launch. One more to bring it back from Settings.
 <p align="center">
   <img src="Screenshots/iphone-light.png" width="200" alt="iPhone, light">
   <img src="Screenshots/iphone-dark.png" width="200" alt="iPhone, dark, indigo tint, hierarchical symbols">
-  <img src="Screenshots/iphone-orange.png" width="200" alt="iPhone, orange tint, palette symbols, secondary button">
+  <img src="Screenshots/iphone-pink.png" width="200" alt="iPhone, pink tint, hierarchical symbols, footnote">
 </p>
 
 ## Install
@@ -98,7 +98,7 @@ configuration.footnote = "You can change this later in Settings."
 | `isHapticsEnabled` | A tap per row, a success note when the button lands. iOS only. |
 | `background` | `.automatic`, `.color(_:)`, `.gradient(_:)`, `.clear`. |
 | `buttonStyle` | `.automatic`, `.prominent`, `.glass`, `.bordered`. |
-| `continueTitle`, `secondaryTitle`, `footnote` | The copy. Localized keys by default. |
+| `continueTitle`, `footnote` | The copy. Localized keys by default. |
 | `maximumFeatureCount` | Show the first N rows of a longer list. |
 | `titleFont`, `featureTitleFont`, `featureSubtitleFont` | Fonts, if the defaults are not your defaults. |
 | `metrics` | Every padding, width and breakpoint in the layout. |
@@ -130,8 +130,9 @@ the top padding drops, because a sheet has no notch to clear. The check is a
 measured width *and* the iPad idiom, so an iPhone in landscape and an iPad in
 Slide Over both keep the phone numbers.
 
-**Mac** takes a 500×580 sheet with a 26pt title and 24pt symbols, and pads its
-own bottom, since there's no home indicator to sit above.
+**Mac** takes a 500×580 sheet with a 26pt title and 24pt symbols, caps the button
+at the same 340pt iPad uses, and pads its own bottom, since there's no home
+indicator to sit above.
 
 ## What it handles for you
 

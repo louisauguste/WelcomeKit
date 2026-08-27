@@ -26,7 +26,6 @@ struct DemoView: View {
 
     @AppStorage("demo.featureCount") private var featureCount = 5
     @AppStorage("demo.footnote") private var showsFootnote = false
-    @AppStorage("demo.secondaryAction") private var showsSecondaryAction = false
     @AppStorage("demo.dismissible") private var isDismissible = true
     @AppStorage("demo.fullScreenCover") private var usesFullScreenCover = false
 
@@ -86,7 +85,6 @@ struct DemoView: View {
                 Section("Content") {
                     Stepper("Features: \(featureCount)", value: $featureCount, in: 1...DemoFeatures.all.count)
                     Toggle("Footnote", isOn: $showsFootnote)
-                    Toggle("Secondary button", isOn: $showsSecondaryAction)
                 }
 
                 Section {
@@ -114,8 +112,7 @@ struct DemoView: View {
             presentation: WelcomePresentation(
                 style: usesFullScreenCover ? .fullScreenCover : .sheet,
                 isDismissible: isDismissible
-            ),
-            onSecondaryAction: showsSecondaryAction ? {} : nil
+            )
         )
         .welcomeSheetOnFirstLaunch(
             id: "demo",
@@ -142,7 +139,6 @@ struct DemoView: View {
         configuration.animation = WelcomeAnimation(style: revealStyle, speed: speed)
         configuration.isHapticsEnabled = isHapticsEnabled
         configuration.footnote = showsFootnote ? "You can change any of this later in Settings." : nil
-        configuration.secondaryTitle = showsSecondaryAction ? "Not now" : nil
         return configuration
     }
 }

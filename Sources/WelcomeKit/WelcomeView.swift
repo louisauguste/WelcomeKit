@@ -22,7 +22,7 @@ import SwiftUI
 /// ```
 ///
 /// Use it directly when you present it yourself, or reach for
-/// ``SwiftUICore/View/welcomeSheet(isPresented:title:features:configuration:onContinue:onSecondaryAction:)``
+/// ``SwiftUICore/View/welcomeSheet(isPresented:title:features:configuration:presentation:onContinue:)``
 /// and its first-launch sibling to skip the plumbing.
 public struct WelcomeView: View {
 
@@ -30,7 +30,6 @@ public struct WelcomeView: View {
     private let features: [WelcomeFeature]
     private let configuration: WelcomeConfiguration
     private let onContinue: () -> Void
-    private let onSecondaryAction: (() -> Void)?
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -55,22 +54,17 @@ public struct WelcomeView: View {
     ///   - features: The rows, in the order they should arrive.
     ///   - configuration: Colour, motion, copy and metrics. See
     ///     ``WelcomeConfiguration``.
-    ///   - onContinue: Called once when the primary button is tapped.
-    ///   - onSecondaryAction: Called when the optional secondary button is
-    ///     tapped. The button only shows when both this and
-    ///     ``WelcomeConfiguration/secondaryTitle`` are set.
+    ///   - onContinue: Called once when the button is tapped.
     public init(
         title: WelcomeText,
         features: [WelcomeFeature],
         configuration: WelcomeConfiguration = .default,
-        onContinue: @escaping () -> Void,
-        onSecondaryAction: (() -> Void)? = nil
+        onContinue: @escaping () -> Void
     ) {
         self.title = title
         self.features = features
         self.configuration = configuration
         self.onContinue = onContinue
-        self.onSecondaryAction = onSecondaryAction
 
         // With the reveal switched off the screen is complete from the first
         // frame, rather than appearing empty until `onAppear` runs. That also
@@ -172,18 +166,6 @@ public struct WelcomeView: View {
         VStack(spacing: 10) {
             continueButton
 
-            if let secondaryTitle = configuration.secondaryTitle, let onSecondaryAction {
-                Button {
-                    onSecondaryAction()
-                } label: {
-                    secondaryTitle
-                        .text(bundle: configuration.localizationBundle, tableName: configuration.localizationTable)
-                        .font(.subheadline.weight(.medium))
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(resolvedAccentColor ?? .accentColor)
-            }
-
             if let footnote = configuration.footnote {
                 footnote
                     .text(bundle: configuration.localizationBundle, tableName: configuration.localizationTable)
@@ -193,7 +175,7 @@ public struct WelcomeView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .welcomeAdaptiveActionWidth(isWide: isWideLayout, maxWidth: metrics.actionMaxWidth)
+        .welcomeAdaptiveActionWidth(isWide: capsActionWidth, maxWidth: metrics.actionMaxWidth)
         .padding(.horizontal, horizontalInset)
         .padding(.top, metrics.bottomBarVerticalPadding)
         .padding(.bottom, actionBottomPadding)
@@ -245,6 +227,7 @@ public struct WelcomeView: View {
         configuration.continueTitle
             .text(bundle: configuration.localizationBundle, tableName: configuration.localizationTable)
             .font(.headline)
+            .padding(.vertical, metrics.actionLabelPadding)
             .welcomeFlexibleLabelWidth()
     }
 
@@ -258,6 +241,17 @@ public struct WelcomeView: View {
     }
 
     private var resolvedAccentColor: Color? { configuration.accentColor }
+
+    /// A phone lets the button fill the width. Every wider surface caps it, a
+    /// Mac window included: a 416pt slab reads as stretched next to the same
+    /// layout on iPad.
+    private var capsActionWidth: Bool {
+        #if os(macOS)
+        true
+        #else
+        isWideLayout
+        #endif
+    }
 
     private var horizontalInset: CGFloat {
         isWideLayout ? metrics.wideHorizontalPadding : metrics.compactHorizontalPadding
