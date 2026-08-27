@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    # macos-26 ships Xcode 26 by default, which the OS 26 availability checks
+    # in PlatformSupport.swift need to compile.
+    runs-on: macos-26
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show the toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Test on macOS
+        run: swift test
+
+      - name: Build for iOS
+        run: |
+          xcodebuild -scheme WelcomeKit \
+            -destination 'generic/platform=iOS Simulator' \
+            -quiet build
