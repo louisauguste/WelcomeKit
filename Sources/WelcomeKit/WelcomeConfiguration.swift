@@ -375,8 +375,8 @@ public struct WelcomeMetrics: Sendable, Equatable {
     public static var automatic: WelcomeMetrics {
         #if os(macOS)
         WelcomeMetrics(
-            compactTopPadding: 32,
-            extraBottomPadding: 46,
+            actionMaxWidth: 300,
+            compactTopPadding: 40,
             actionLabelPadding: 5,
             symbolColumnWidth: 41,
             symbolColumnHeight: 33

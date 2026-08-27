@@ -60,15 +60,15 @@ struct LayoutTests {
     func platformMetrics() {
         let metrics = WelcomeMetrics.automatic
         #if os(macOS)
-        #expect(metrics.compactTopPadding == 32)
+        #expect(metrics.compactTopPadding == 40)
         #expect(metrics.symbolColumnWidth == 41)
         #expect(metrics.actionLabelPadding == 5)
-        #expect(metrics.extraBottomPadding == 46)
+        #expect(metrics.actionMaxWidth == 300)
         #else
         #expect(metrics.compactTopPadding == 84)
         #expect(metrics.symbolColumnWidth == 42)
         #expect(metrics.actionLabelPadding == 0)
-        #expect(metrics.extraBottomPadding == 34)
+        #expect(metrics.actionMaxWidth == 340)
         #endif
     }
 }

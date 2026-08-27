@@ -131,7 +131,7 @@ measured width *and* the iPad idiom, so an iPhone in landscape and an iPad in
 Slide Over both keep the phone numbers.
 
 **Mac** takes a 500×580 sheet with a 26pt title and 27pt symbols, caps the button
-at the same 340pt iPad uses, sets the label in 15pt medium rather than the
+at 300pt rather than iPad's 340, sets its label in 15pt medium instead of the
 smaller, heavier `.headline` a Mac resolves that to, and pads its own bottom,
 since there's no home indicator to sit above.
 
