@@ -56,6 +56,13 @@ public struct WelcomeConfiguration: @unchecked Sendable {
 
     // MARK: - Type
 
+    /// Which cut of San Francisco the screen is set in.
+    ///
+    /// Applies to every font WelcomeKit picks for itself. A font you supply
+    /// through ``titleFont`` and its siblings is used exactly as given, so set
+    /// the design on that font instead if you override one.
+    public var fontDesign: WelcomeFontDesign
+
     /// Font of the big title. `nil` uses `.title` bold on iOS, 26pt bold on macOS.
     public var titleFont: Font?
 
@@ -129,6 +136,7 @@ public struct WelcomeConfiguration: @unchecked Sendable {
         background: WelcomeBackground = .automatic,
         symbolSize: CGFloat? = nil,
         symbolWeight: Font.Weight = .regular,
+        fontDesign: WelcomeFontDesign = .default,
         titleFont: Font? = nil,
         featureTitleFont: Font? = nil,
         featureSubtitleFont: Font? = nil,
@@ -151,6 +159,7 @@ public struct WelcomeConfiguration: @unchecked Sendable {
         self.background = background
         self.symbolSize = symbolSize
         self.symbolWeight = symbolWeight
+        self.fontDesign = fontDesign
         self.titleFont = titleFont
         self.featureTitleFont = featureTitleFont
         self.featureSubtitleFont = featureSubtitleFont
@@ -174,6 +183,30 @@ public struct WelcomeConfiguration: @unchecked Sendable {
     /// No animation, no haptics — for screenshots, tests, and people who would
     /// rather their app just appear.
     public static let plain = WelcomeConfiguration(animation: .disabled, isHapticsEnabled: false)
+}
+
+// MARK: - Font design
+
+/// The cuts of San Francisco, mirrored so a configuration stays `Sendable` and
+/// comparable.
+public enum WelcomeFontDesign: String, Sendable, CaseIterable, Hashable {
+    /// SF Pro. The system default, and what every Apple welcome sheet uses.
+    case `default`
+    /// SF Pro Rounded.
+    case rounded
+    /// New York, Apple's serif.
+    case serif
+    /// SF Mono.
+    case monospaced
+
+    var fontDesign: Font.Design {
+        switch self {
+        case .default: .default
+        case .rounded: .rounded
+        case .serif: .serif
+        case .monospaced: .monospaced
+        }
+    }
 }
 
 // MARK: - Background
@@ -303,6 +336,12 @@ public struct WelcomeMetrics: Sendable, Equatable {
     /// Side margins on compact layouts, and on macOS.
     public var compactHorizontalPadding: CGFloat
 
+    /// Side margins of the primary button, which sits 2pt wider than the text
+    /// above it so the gap either side of it matches the gap underneath. On
+    /// wide layouts and on macOS ``actionMaxWidth`` decides the width instead,
+    /// and this is never reached.
+    public var actionHorizontalPadding: CGFloat
+
     /// Headroom above the title on compact layouts — enough to clear a notch.
     public var compactTopPadding: CGFloat
 
@@ -314,6 +353,12 @@ public struct WelcomeMetrics: Sendable, Equatable {
 
     /// Vertical padding inside the bottom bar.
     public var bottomBarVerticalPadding: CGFloat
+
+    /// Gap under the primary button on compact layouts, added to the home
+    /// indicator's own inset. Tuned so the total matches
+    /// ``actionHorizontalPadding``, which is what makes the button look evenly
+    /// inset on three sides.
+    public var compactActionBottomPadding: CGFloat
 
     /// Extra height inside the primary button, added around its label. iOS gets
     /// a tall enough button from `.controlSize(.large)` alone; a Mac one comes
@@ -338,15 +383,17 @@ public struct WelcomeMetrics: Sendable, Equatable {
 
     public init(
         wideWidthThreshold: CGFloat = 500,
-        actionMaxWidth: CGFloat = 340,
+        actionMaxWidth: CGFloat = 320,
         featureListMaxWidth: CGFloat = 520,
         wideHorizontalPadding: CGFloat = 44,
         compactHorizontalPadding: CGFloat = 42,
-        compactTopPadding: CGFloat = 84,
+        actionHorizontalPadding: CGFloat = 40,
+        compactTopPadding: CGFloat = 72,
         wideTopPadding: CGFloat = 64,
         extraBottomPadding: CGFloat = 34,
         bottomBarVerticalPadding: CGFloat = 8,
-        actionLabelPadding: CGFloat = 0,
+        compactActionBottomPadding: CGFloat = 6,
+        actionLabelPadding: CGFloat = 1,
         titleBottomPadding: CGFloat = 28,
         featureSpacing: CGFloat = 20,
         symbolSpacing: CGFloat = 12,
@@ -358,10 +405,12 @@ public struct WelcomeMetrics: Sendable, Equatable {
         self.featureListMaxWidth = featureListMaxWidth
         self.wideHorizontalPadding = wideHorizontalPadding
         self.compactHorizontalPadding = compactHorizontalPadding
+        self.actionHorizontalPadding = actionHorizontalPadding
         self.compactTopPadding = compactTopPadding
         self.wideTopPadding = wideTopPadding
         self.extraBottomPadding = extraBottomPadding
         self.bottomBarVerticalPadding = bottomBarVerticalPadding
+        self.compactActionBottomPadding = compactActionBottomPadding
         self.actionLabelPadding = actionLabelPadding
         self.titleBottomPadding = titleBottomPadding
         self.featureSpacing = featureSpacing

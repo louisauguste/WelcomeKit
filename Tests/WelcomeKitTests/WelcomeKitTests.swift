@@ -38,6 +38,59 @@ struct ConfigurationTests {
         #expect(WelcomeAnimation(speed: -4).speed > 0)
         #expect(WelcomeAnimation.speed(2).speed == 2)
     }
+
+    @Test("Every cut of San Francisco is offered, SF Pro by default")
+    func fontDesigns() {
+        #expect(WelcomeConfiguration.default.fontDesign == .default)
+        #expect(
+            WelcomeFontDesign.allCases.map(\.rawValue)
+            == ["default", "rounded", "serif", "monospaced"]
+        )
+    }
+}
+
+@Suite("Headline")
+struct HeadlineTests {
+
+    @Test("A string literal is a plain, single-colour headline")
+    func stringLiteral() {
+        let headline: WelcomeHeadline = "Welcome to Ova"
+        guard case .plain = headline else {
+            Issue.record("Expected a plain headline")
+            return
+        }
+    }
+
+    @Test("The update headline leads with Apple's wording")
+    func whatsNew() {
+        guard case .twoTone(let lead, let name) = WelcomeHeadline.whatsNew(in: "Ova"),
+              case .localized(let leadKey) = lead,
+              case .localized(let nameKey) = name else {
+            Issue.record("Expected a two-tone headline built from localized keys")
+            return
+        }
+        #expect(leadKey == LocalizedStringKey("What\u{2019}s new in"))
+        #expect(nameKey == LocalizedStringKey("Ova"))
+    }
+
+    @Test("The first-run headline leads with Welcome to")
+    func welcomeTo() {
+        guard case .twoTone(let lead, _) = WelcomeHeadline.welcome(to: "Ova"),
+              case .localized(let leadKey) = lead else {
+            Issue.record("Expected a two-tone headline")
+            return
+        }
+        #expect(leadKey == LocalizedStringKey("Welcome to"))
+    }
+
+    @Test("The lead line costs a line on top of the configured limit")
+    func lineLimits() {
+        let plain = WelcomeHeadline.plain("Welcome to Ova")
+        let twoTone = WelcomeHeadline.whatsNew(in: "Ova")
+        #expect(plain.lineLimit(2) == 2)
+        #expect(twoTone.lineLimit(2) == 3)
+        #expect(twoTone.lineLimit(nil) == nil)
+    }
 }
 
 @Suite("Layout")
@@ -65,11 +118,27 @@ struct LayoutTests {
         #expect(metrics.actionLabelPadding == 5)
         #expect(metrics.actionMaxWidth == 300)
         #else
-        #expect(metrics.compactTopPadding == 84)
+        #expect(metrics.compactTopPadding == 72)
         #expect(metrics.symbolColumnWidth == 42)
-        #expect(metrics.actionLabelPadding == 0)
-        #expect(metrics.actionMaxWidth == 340)
+        #expect(metrics.actionLabelPadding == 1)
+        #expect(metrics.actionMaxWidth == 320)
         #endif
+    }
+
+    @Test("The button's side margins and its bottom gap agree on a phone")
+    func evenActionInset() {
+        let metrics = WelcomeMetrics()
+        // A notched phone contributes 34pt of home indicator under the bar. Add
+        // the bar's own gap and it has to land on the side margins, or the
+        // button sits closer to one edge than the other two.
+        let homeIndicator: CGFloat = 34
+        #expect(metrics.compactActionBottomPadding + homeIndicator == metrics.actionHorizontalPadding)
+    }
+
+    @Test("The button is inset a little further than the text above it")
+    func actionOutdent() {
+        let metrics = WelcomeMetrics()
+        #expect(metrics.actionHorizontalPadding < metrics.compactHorizontalPadding)
     }
 }
 

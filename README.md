@@ -24,7 +24,7 @@ Xcode → File → Add Package Dependencies, then paste the repository URL. Or i
 `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/louisauguste/WelcomeKit.git", from: "1.0.0")
+.package(url: "https://github.com/louisauguste/WelcomeKit.git", from: "1.2.0")
 ```
 
 ## Use it
@@ -72,10 +72,30 @@ Same screen, same animation, no flag touched.
 ### Or present it yourself
 
 ```swift
-WelcomeView(title: "Welcome to Ova", features: features) {
+WelcomeView(headline: "Welcome to Ova", features: features) {
     dismiss()
 }
 ```
+
+### Two headlines
+
+A first run gets one line. An update gets the two-tone headline Apple uses — a
+lead line in your accent colour, the app's own name underneath:
+
+```swift
+WelcomeView(headline: .whatsNew(in: "Ova"), features: changes) { dismiss() }
+WelcomeView(headline: .welcome(to: "Ova"), features: features) { dismiss() }
+WelcomeView(headline: "Welcome to Ova", features: features) { dismiss() }
+```
+
+<p align="center">
+  <img src="Screenshots/iphone-whatsnew.png" width="200" alt="iPhone, the two-tone What&#39;s new in headline">
+</p>
+
+Both lead lines are localized keys, so an app that already translates
+"Welcome to" gets it for nothing, and `.twoTone(lead:name:)` takes your own
+wording. The whole headline renders as a single `Text`: it wraps, it scales with
+Dynamic Type, and VoiceOver reads it in one go rather than as two stacked views.
 
 ## Make it yours
 
@@ -94,7 +114,7 @@ configuration.footnote = "You can change this later in Settings."
 |---|---|
 | `accentColor` | Tint for the symbols and the button. `nil` inherits the app's own `.tint(_:)`. |
 | `symbolRenderingMode` | `.monochrome`, `.hierarchical`, `.palette`, `.multicolor`, with `symbolPalette` for the palette layers. |
-| `symbolSize`, `symbolWeight` | 28pt regular on iOS, 24pt on macOS, until you say otherwise. |
+| `symbolSize`, `symbolWeight` | 28pt regular on iOS, 27pt on macOS, until you say otherwise. |
 | `animation` | `.default`, `.disabled`, `.speed(1.5)`, or a `WelcomeAnimation` with your own delays. |
 | `animation.style` | `.blur` (the reference), `.slide`, `.fade`, `.scale`, `.none`. |
 | `isHapticsEnabled` | A tap per row, a success note when the button lands. iOS only. |
@@ -102,7 +122,8 @@ configuration.footnote = "You can change this later in Settings."
 | `buttonStyle` | `.automatic`, `.prominent`, `.glass`, `.bordered`. |
 | `continueTitle`, `footnote` | The copy. Localized keys by default. |
 | `maximumFeatureCount` | Show the first N rows of a longer list. |
-| `titleFont`, `featureTitleFont`, `featureSubtitleFont`, `buttonFont` | Fonts, if the defaults are not your defaults. |
+| `fontDesign` | `.default` (SF Pro), `.rounded`, `.serif` (New York), `.monospaced`. Applies to every font the package picks for itself. |
+| `titleFont`, `featureTitleFont`, `featureSubtitleFont`, `buttonFont` | Fonts, if the defaults are not your defaults. A font you pass wins outright, `fontDesign` included. |
 | `metrics` | Every padding, width and breakpoint in the layout. |
 | `localizationBundle`, `localizationTable` | Where the keys are looked up. |
 
@@ -123,17 +144,18 @@ WelcomeFeature("Pro", subtitle: "Every model, no limits.",
   <img src="Screenshots/macos-dark.png" width="270" alt="macOS, dark">
 </p>
 
-**iPhone** gets the layout the design was drawn for: full-bleed button, 42pt
-margins, notch-sized headroom.
+**iPhone** gets the layout the design was drawn for: 42pt text margins, notch-sized
+headroom, and a full-bleed button inset 40pt on all three sides, so the gap under
+it matches the gap to its left and right.
 
 **iPad** measures the surface it landed on. Past 500pt the button stops growing
-at 340pt and centres, the text column widens to 520pt with tighter margins, and
+at 320pt and centres, the text column widens to 520pt with tighter margins, and
 the top padding drops, because a sheet has no notch to clear. The check is a
 measured width *and* the iPad idiom, so an iPhone in landscape and an iPad in
 Slide Over both keep the phone numbers.
 
 **Mac** takes a 500×580 sheet with a 26pt title and 27pt symbols, caps the button
-at 300pt rather than iPad's 340, sets its label in 15pt medium instead of the
+at 300pt rather than iPad's 320, sets its label in 15pt medium instead of the
 smaller, heavier `.headline` a Mac resolves that to, and pads its own bottom,
 since there's no home indicator to sit above.
 
@@ -168,7 +190,11 @@ Give a second screen its own `id` and it keeps its own flag, which is enough for
 a "what's new in 2.0" sheet:
 
 ```swift
-.welcomeSheetOnFirstLaunch(id: "whats-new-2.0", title: "What's new", features: changes)
+.welcomeSheetOnFirstLaunch(
+    id: "whats-new-2.0",
+    headline: .whatsNew(in: "Ova"),
+    features: changes
+)
 ```
 
 ## Demo

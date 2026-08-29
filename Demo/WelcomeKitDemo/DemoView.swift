@@ -19,6 +19,8 @@ struct DemoView: View {
     @AppStorage("demo.symbols") private var symbolRenderingMode: WelcomeSymbolRenderingMode = .monochrome
     @AppStorage("demo.button") private var buttonStyle: WelcomeButtonStyle = .automatic
     @AppStorage("demo.background") private var background: DemoBackground = .automatic
+    @AppStorage("demo.font") private var fontDesign: WelcomeFontDesign = .default
+    @AppStorage("demo.headline") private var headlineVariant: DemoHeadline = .plain
 
     @AppStorage("demo.reveal") private var revealStyle: WelcomeRevealStyle = .blur
     @AppStorage("demo.speed") private var speed: Double = 1
@@ -63,6 +65,11 @@ struct DemoView: View {
                             Text(background.name).tag(background)
                         }
                     }
+                    Picker("Font", selection: $fontDesign) {
+                        ForEach(WelcomeFontDesign.allCases, id: \.self) { design in
+                            Text(design.name).tag(design)
+                        }
+                    }
                 }
 
                 Section("Motion") {
@@ -83,6 +90,11 @@ struct DemoView: View {
                 }
 
                 Section("Content") {
+                    Picker("Headline", selection: $headlineVariant) {
+                        ForEach(DemoHeadline.allCases, id: \.self) { variant in
+                            Text(variant.name).tag(variant)
+                        }
+                    }
                     Stepper("Features: \(featureCount)", value: $featureCount, in: 1...DemoFeatures.all.count)
                     Toggle("Footnote", isOn: $showsFootnote)
                 }
@@ -106,7 +118,7 @@ struct DemoView: View {
         }
         .welcomeSheet(
             isPresented: $isShowingWelcome,
-            title: "Welcome to WelcomeKit",
+            headline: headlineVariant.headline,
             features: Array(DemoFeatures.all.prefix(featureCount)),
             configuration: configuration,
             presentation: WelcomePresentation(
@@ -116,7 +128,7 @@ struct DemoView: View {
         )
         .welcomeSheetOnFirstLaunch(
             id: "demo",
-            title: "Welcome to WelcomeKit",
+            headline: "Welcome to WelcomeKit",
             features: Array(DemoFeatures.all.prefix(5)),
             configuration: .default
         )
@@ -136,6 +148,7 @@ struct DemoView: View {
         configuration.symbolPalette = [tint.color, tint.color.opacity(0.35)]
         configuration.buttonStyle = buttonStyle
         configuration.background = background.background
+        configuration.fontDesign = fontDesign
         configuration.animation = WelcomeAnimation(style: revealStyle, speed: speed)
         configuration.isHapticsEnabled = isHapticsEnabled
         configuration.footnote = showsFootnote ? "You can change any of this later in Settings." : nil
@@ -158,6 +171,39 @@ enum DemoTint: String, CaseIterable {
         case .orange: .orange
         case .green: .green
         case .teal: .teal
+        }
+    }
+}
+
+/// The app's name is the same in every variant; only the shape of the headline
+/// changes.
+enum DemoHeadline: String, CaseIterable {
+    case plain, welcome, whatsNew
+
+    var name: String {
+        switch self {
+        case .plain: "Plain"
+        case .welcome: "Welcome to"
+        case .whatsNew: "What's New in"
+        }
+    }
+
+    var headline: WelcomeHeadline {
+        switch self {
+        case .plain: "Welcome to WelcomeKit"
+        case .welcome: .welcome(to: "WelcomeKit")
+        case .whatsNew: .whatsNew(in: "WelcomeKit")
+        }
+    }
+}
+
+extension WelcomeFontDesign {
+    var name: String {
+        switch self {
+        case .default: "SF Pro"
+        case .rounded: "SF Rounded"
+        case .serif: "New York"
+        case .monospaced: "SF Mono"
         }
     }
 }

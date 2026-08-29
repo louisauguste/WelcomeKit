@@ -59,13 +59,14 @@ shoot () { # udid, name, appearance, extra launch args…
 
 echo "Capturing iPhone…"
 prepare "$PHONE"
-shoot "$PHONE" iphone-light light  -demo.tint blue   -demo.symbols monochrome   -demo.featureCount 5
-shoot "$PHONE" iphone-dark  dark   -demo.tint indigo -demo.symbols hierarchical -demo.featureCount 5
-shoot "$PHONE" iphone-pink  light  -demo.tint pink   -demo.symbols hierarchical -demo.featureCount 4 -demo.footnote YES
+shoot "$PHONE" iphone-light light  -demo.tint blue   -demo.symbols monochrome   -demo.featureCount 5 -demo.headline plain    -demo.font default
+shoot "$PHONE" iphone-dark  dark   -demo.tint indigo -demo.symbols hierarchical -demo.featureCount 5 -demo.headline plain    -demo.font default
+shoot "$PHONE" iphone-pink  light  -demo.tint pink   -demo.symbols hierarchical -demo.featureCount 4 -demo.headline plain    -demo.font default -demo.footnote YES
+shoot "$PHONE" iphone-whatsnew light -demo.tint indigo -demo.symbols monochrome -demo.featureCount 4 -demo.headline whatsNew -demo.font default
 
 echo "Capturing iPad…"
 prepare "$PAD"
-shoot "$PAD" ipad-light light -demo.tint blue -demo.symbols monochrome -demo.featureCount 5
+shoot "$PAD" ipad-light light -demo.tint blue -demo.symbols monochrome -demo.featureCount 5 -demo.headline plain -demo.font default
 
 echo "Recording the reveal on iPhone…"
 xcrun simctl terminate "$PHONE" "$BUNDLE_ID" >/dev/null 2>&1 || true
@@ -75,7 +76,8 @@ RECORDER=$!
 python3 -c "import time; time.sleep(1.5)"
 xcrun simctl launch "$PHONE" "$BUNDLE_ID" \
     -demo.autoPresent YES -WelcomeKit.hasSeen.demo YES \
-    -demo.tint blue -demo.symbols monochrome -demo.featureCount 5 >/dev/null
+    -demo.tint blue -demo.symbols monochrome -demo.featureCount 5 \
+    -demo.headline plain -demo.font default >/dev/null
 python3 -c "import time; time.sleep(5)"
 kill -INT $RECORDER
 wait $RECORDER 2>/dev/null || true
@@ -102,7 +104,7 @@ mac_shoot () { # name, appearance, extra args…
 
 # Liquid Glass does not composite into a layer render, so the macOS shots use
 # the flat prominent button — which is what the reference macOS sheet uses too.
-mac_shoot macos-light light -demo.tint blue   -demo.symbols monochrome   -demo.button prominent -demo.featureCount 5
-mac_shoot macos-dark  dark  -demo.tint indigo -demo.symbols hierarchical -demo.button prominent -demo.featureCount 5
+mac_shoot macos-light light -demo.tint blue   -demo.symbols monochrome   -demo.button prominent -demo.featureCount 5 -demo.headline plain -demo.font default
+mac_shoot macos-dark  dark  -demo.tint indigo -demo.symbols hierarchical -demo.button prominent -demo.featureCount 5 -demo.headline plain -demo.font default
 
 echo "Done. Images are in $OUT"

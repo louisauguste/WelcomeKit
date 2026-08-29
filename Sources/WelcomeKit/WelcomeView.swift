@@ -11,7 +11,7 @@ import SwiftUI
 ///
 /// ```swift
 /// WelcomeView(
-///     title: "Welcome to Ova",
+///     headline: "Welcome to Ova",
 ///     features: [
 ///         WelcomeFeature("Private", subtitle: "Runs on device.", systemImage: "lock.fill"),
 ///         WelcomeFeature("Fast", subtitle: "No round trip.", systemImage: "bolt.fill")
@@ -21,12 +21,16 @@ import SwiftUI
 /// }
 /// ```
 ///
+/// Pass ``WelcomeHeadline/whatsNew(in:)`` instead of a plain string to get
+/// Apple's two-tone update headline — a tinted "What's New in" over the app's
+/// own name.
+///
 /// Use it directly when you present it yourself, or reach for
 /// ``SwiftUICore/View/welcomeSheet(isPresented:title:features:configuration:presentation:onContinue:)``
 /// and its first-launch sibling to skip the plumbing.
 public struct WelcomeView: View {
 
-    private let title: WelcomeText
+    private let headline: WelcomeHeadline
     private let features: [WelcomeFeature]
     private let configuration: WelcomeConfiguration
     private let onContinue: () -> Void
@@ -49,19 +53,20 @@ public struct WelcomeView: View {
     /// Creates a welcome screen.
     ///
     /// - Parameters:
-    ///   - title: The headline. A string literal is looked up in your app's
-    ///     string catalog; use `.verbatim("…")` to opt out.
+    ///   - headline: The big line at the top. A string literal is looked up in
+    ///     your app's string catalog; ``WelcomeHeadline/whatsNew(in:)`` and
+    ///     ``WelcomeHeadline/welcome(to:)`` give you the two-tone variant.
     ///   - features: The rows, in the order they should arrive.
     ///   - configuration: Colour, motion, copy and metrics. See
     ///     ``WelcomeConfiguration``.
     ///   - onContinue: Called once when the button is tapped.
     public init(
-        title: WelcomeText,
+        headline: WelcomeHeadline,
         features: [WelcomeFeature],
         configuration: WelcomeConfiguration = .default,
         onContinue: @escaping () -> Void
     ) {
-        self.title = title
+        self.headline = headline
         self.features = features
         self.configuration = configuration
         self.onContinue = onContinue
@@ -74,6 +79,29 @@ public struct WelcomeView: View {
         _isTitleVisible = State(initialValue: isStatic)
         _visibleFeatureCount = State(initialValue: isStatic ? features.count : 0)
         _isActionVisible = State(initialValue: isStatic)
+    }
+
+    /// Creates a welcome screen with a single-colour headline.
+    ///
+    /// - Parameters:
+    ///   - title: The headline. A string literal is looked up in your app's
+    ///     string catalog; use `.verbatim("…")` to opt out.
+    ///   - features: The rows, in the order they should arrive.
+    ///   - configuration: Colour, motion, copy and metrics. See
+    ///     ``WelcomeConfiguration``.
+    ///   - onContinue: Called once when the button is tapped.
+    public init(
+        title: WelcomeText,
+        features: [WelcomeFeature],
+        configuration: WelcomeConfiguration = .default,
+        onContinue: @escaping () -> Void
+    ) {
+        self.init(
+            headline: .plain(title),
+            features: features,
+            configuration: configuration,
+            onContinue: onContinue
+        )
     }
 
     public var body: some View {
@@ -137,11 +165,16 @@ public struct WelcomeView: View {
     }
 
     private var titleView: some View {
-        title.text(bundle: configuration.localizationBundle, tableName: configuration.localizationTable)
+        headline
+            .text(
+                bundle: configuration.localizationBundle,
+                tableName: configuration.localizationTable,
+                accent: headlineAccentStyle
+            )
             .font(resolvedTitleFont)
             .foregroundStyle(.primary)
             .multilineTextAlignment(configuration.titleAlignment)
-            .lineLimit(configuration.titleLineLimit)
+            .lineLimit(headline.lineLimit(configuration.titleLineLimit))
             .minimumScaleFactor(0.7)
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: titleFrameAlignment)
@@ -169,14 +202,14 @@ public struct WelcomeView: View {
             if let footnote = configuration.footnote {
                 footnote
                     .text(bundle: configuration.localizationBundle, tableName: configuration.localizationTable)
-                    .font(.footnote)
+                    .font(.system(.footnote, design: resolvedFontDesign))
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
         .welcomeAdaptiveActionWidth(isWide: capsActionWidth, maxWidth: metrics.actionMaxWidth)
-        .padding(.horizontal, horizontalInset)
+        .padding(.horizontal, metrics.actionHorizontalPadding)
         .padding(.top, metrics.bottomBarVerticalPadding)
         .padding(.bottom, actionBottomPadding)
         .welcomeReveal(style: revealStyle, isVisible: isActionVisible, offset: 16, blur: 10, scale: 0.94)
@@ -263,7 +296,9 @@ public struct WelcomeView: View {
         #if os(macOS)
         metrics.bottomBarVerticalPadding + metrics.extraBottomPadding
         #else
-        metrics.bottomBarVerticalPadding + (isWideLayout ? metrics.extraBottomPadding : 0)
+        isWideLayout
+            ? metrics.bottomBarVerticalPadding + metrics.extraBottomPadding
+            : metrics.compactActionBottomPadding
         #endif
     }
 
@@ -275,12 +310,22 @@ public struct WelcomeView: View {
         }
     }
 
+    private var resolvedFontDesign: Font.Design { configuration.fontDesign.fontDesign }
+
+    /// The accent the two-tone headline's lead line is drawn in. With no accent
+    /// configured it falls through to the surrounding tint, the same way the
+    /// symbols and the button do.
+    private var headlineAccentStyle: AnyShapeStyle {
+        if let accent = configuration.accentColor { return AnyShapeStyle(accent) }
+        return AnyShapeStyle(.tint)
+    }
+
     private var resolvedTitleFont: Font {
         if let font = configuration.titleFont { return font }
         #if os(macOS)
-        return .system(size: 26, weight: .bold)
+        return .system(size: 26, weight: .bold, design: resolvedFontDesign)
         #else
-        return .title.weight(.bold)
+        return .system(.title, design: resolvedFontDesign, weight: .bold)
         #endif
     }
 
@@ -290,9 +335,9 @@ public struct WelcomeView: View {
     private var resolvedButtonFont: Font {
         if let font = configuration.buttonFont { return font }
         #if os(macOS)
-        return .system(size: 15, weight: .medium)
+        return .system(size: 15, weight: .medium, design: resolvedFontDesign)
         #else
-        return .headline
+        return .system(.headline, design: resolvedFontDesign)
         #endif
     }
 
@@ -461,21 +506,23 @@ private struct WelcomeFeatureRow: View {
         #endif
     }
 
+    private var resolvedFontDesign: Font.Design { configuration.fontDesign.fontDesign }
+
     private var resolvedTitleFont: Font {
         if let font = configuration.featureTitleFont { return font }
         #if os(macOS)
-        return .system(size: 15, weight: .semibold)
+        return .system(size: 15, weight: .semibold, design: resolvedFontDesign)
         #else
-        return .body.weight(.semibold)
+        return .system(.body, design: resolvedFontDesign, weight: .semibold)
         #endif
     }
 
     private var resolvedSubtitleFont: Font {
         if let font = configuration.featureSubtitleFont { return font }
         #if os(macOS)
-        return .system(size: 14)
+        return .system(size: 14, design: resolvedFontDesign)
         #else
-        return .body
+        return .system(.body, design: resolvedFontDesign)
         #endif
     }
 }

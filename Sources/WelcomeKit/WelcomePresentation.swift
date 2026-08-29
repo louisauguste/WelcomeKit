@@ -62,7 +62,7 @@ public extension View {
     /// Button("Welcome screen") { showWelcome = true }
     ///     .welcomeSheet(
     ///         isPresented: $showWelcome,
-    ///         title: "Welcome to Ova",
+    ///         headline: "Welcome to Ova",
     ///         features: features,
     ///         presentation: .dismissible
     ///     )
@@ -71,7 +71,7 @@ public extension View {
     /// The binding is set back to `false` for you when the user continues.
     func welcomeSheet(
         isPresented: Binding<Bool>,
-        title: WelcomeText,
+        headline: WelcomeHeadline,
         features: [WelcomeFeature],
         configuration: WelcomeConfiguration = .default,
         presentation: WelcomePresentation = .automatic,
@@ -81,7 +81,7 @@ public extension View {
             WelcomeSheetModifier(
                 isPresented: isPresented,
                 content: WelcomeContent(
-                    title: title,
+                    headline: headline,
                     features: features,
                     configuration: configuration,
                     onContinue: onContinue
@@ -98,7 +98,7 @@ public extension View {
     /// ```swift
     /// ContentView()
     ///     .welcomeSheetOnFirstLaunch(
-    ///         title: "Welcome to Ova",
+    ///         headline: "Welcome to Ova",
     ///         features: features
     ///     )
     /// ```
@@ -115,7 +115,7 @@ public extension View {
     func welcomeSheetOnFirstLaunch(
         id: String = WelcomeStore.defaultID,
         store: UserDefaults? = nil,
-        title: WelcomeText,
+        headline: WelcomeHeadline,
         features: [WelcomeFeature],
         configuration: WelcomeConfiguration = .default,
         presentation: WelcomePresentation = .automatic,
@@ -126,7 +126,7 @@ public extension View {
                 id: id,
                 store: store,
                 content: WelcomeContent(
-                    title: title,
+                    headline: headline,
                     features: features,
                     configuration: configuration,
                     onContinue: onContinue
@@ -135,12 +135,53 @@ public extension View {
             )
         )
     }
+
+    /// Presents the welcome screen with a single-colour headline.
+    func welcomeSheet(
+        isPresented: Binding<Bool>,
+        title: WelcomeText,
+        features: [WelcomeFeature],
+        configuration: WelcomeConfiguration = .default,
+        presentation: WelcomePresentation = .automatic,
+        onContinue: (() -> Void)? = nil
+    ) -> some View {
+        welcomeSheet(
+            isPresented: isPresented,
+            headline: .plain(title),
+            features: features,
+            configuration: configuration,
+            presentation: presentation,
+            onContinue: onContinue
+        )
+    }
+
+    /// Presents the welcome screen once, on first launch, with a single-colour
+    /// headline.
+    func welcomeSheetOnFirstLaunch(
+        id: String = WelcomeStore.defaultID,
+        store: UserDefaults? = nil,
+        title: WelcomeText,
+        features: [WelcomeFeature],
+        configuration: WelcomeConfiguration = .default,
+        presentation: WelcomePresentation = .automatic,
+        onContinue: (() -> Void)? = nil
+    ) -> some View {
+        welcomeSheetOnFirstLaunch(
+            id: id,
+            store: store,
+            headline: .plain(title),
+            features: features,
+            configuration: configuration,
+            presentation: presentation,
+            onContinue: onContinue
+        )
+    }
 }
 
 // MARK: - Internals
 
 struct WelcomeContent {
-    let title: WelcomeText
+    let headline: WelcomeHeadline
     let features: [WelcomeFeature]
     let configuration: WelcomeConfiguration
     let onContinue: (() -> Void)?
@@ -167,7 +208,7 @@ private struct WelcomeSheetModifier: ViewModifier {
 
     private var screen: some View {
         WelcomeView(
-            title: content.title,
+            headline: content.headline,
             features: content.features,
             configuration: content.configuration,
             onContinue: {
