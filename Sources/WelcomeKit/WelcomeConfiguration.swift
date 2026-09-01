@@ -103,6 +103,10 @@ public struct WelcomeConfiguration: @unchecked Sendable {
     /// Look of the primary button.
     public var buttonStyle: WelcomeButtonStyle
 
+    /// Where the primary button sits on macOS. Ignored on iOS and visionOS,
+    /// which always lay the button out full-bleed.
+    public var macOSActionPlacement: WelcomeMacOSActionPlacement
+
     // MARK: - Motion
 
     /// The staggered reveal. Use ``WelcomeAnimation/disabled`` for an instant
@@ -147,6 +151,7 @@ public struct WelcomeConfiguration: @unchecked Sendable {
         maximumFeatureCount: Int? = nil,
         continueTitle: WelcomeText = .localized("Continue"),
         buttonStyle: WelcomeButtonStyle = .automatic,
+        macOSActionPlacement: WelcomeMacOSActionPlacement = .trailing,
         animation: WelcomeAnimation = .default,
         isHapticsEnabled: Bool = true,
         metrics: WelcomeMetrics = .automatic,
@@ -170,6 +175,7 @@ public struct WelcomeConfiguration: @unchecked Sendable {
         self.maximumFeatureCount = maximumFeatureCount
         self.continueTitle = continueTitle
         self.buttonStyle = buttonStyle
+        self.macOSActionPlacement = macOSActionPlacement
         self.animation = animation
         self.isHapticsEnabled = isHapticsEnabled
         self.metrics = metrics
@@ -236,6 +242,18 @@ public enum WelcomeButtonStyle: String, Sendable, CaseIterable {
     case glass
     /// A bordered, non-filled button.
     case bordered
+}
+
+// MARK: - macOS action placement
+
+/// Where ``WelcomeView``'s primary button sits on macOS. iOS and visionOS are
+/// unaffected — they always use the full-bleed layout ``fullWidth`` describes.
+public enum WelcomeMacOSActionPlacement: String, Sendable, CaseIterable {
+    /// A compact button anchored to the window's bottom-trailing corner, the
+    /// grammar Setup Assistant and Migration Assistant both use. The default.
+    case trailing
+    /// The full-width, centred bar every other platform uses.
+    case fullWidth
 }
 
 // MARK: - Animation
@@ -420,12 +438,12 @@ public struct WelcomeMetrics: Sendable, Equatable {
     }
 
     /// Platform defaults: the iOS numbers, or the tighter macOS ones inside a
-    /// 500×580 sheet.
+    /// 480×560 sheet.
     public static var automatic: WelcomeMetrics {
         #if os(macOS)
         WelcomeMetrics(
             actionMaxWidth: 300,
-            compactTopPadding: 40,
+            compactTopPadding: 56,
             actionLabelPadding: 5,
             symbolColumnWidth: 41,
             symbolColumnHeight: 33

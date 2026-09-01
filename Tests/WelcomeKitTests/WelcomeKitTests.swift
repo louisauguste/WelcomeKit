@@ -113,7 +113,7 @@ struct LayoutTests {
     func platformMetrics() {
         let metrics = WelcomeMetrics.automatic
         #if os(macOS)
-        #expect(metrics.compactTopPadding == 40)
+        #expect(metrics.compactTopPadding == 56)
         #expect(metrics.symbolColumnWidth == 41)
         #expect(metrics.actionLabelPadding == 5)
         #expect(metrics.actionMaxWidth == 300)

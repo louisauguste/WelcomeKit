@@ -130,6 +130,9 @@ public struct WelcomeView: View {
         .welcomeBottomBar(fadeColor: backgroundFadeColor) {
             bottomBar
         }
+        .overlay(alignment: .bottomTrailing) {
+            trailingActionOverlay
+        }
         .welcomeTracksWideLayout($isWideLayout, threshold: metrics.wideWidthThreshold)
         .sensoryFeedback(trigger: mediumFeedback) { _, _ in
             configuration.isHapticsEnabled ? .impact(weight: .medium) : nil
@@ -195,17 +198,37 @@ public struct WelcomeView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    /// On macOS's ``WelcomeMacOSActionPlacement/trailing`` placement the button
+    /// moves into ``trailingActionOverlay``, so this bar carries only the
+    /// footnote — still centred under the content, not following the button
+    /// into the corner. Every other configuration keeps the original combined
+    /// bar.
+    @ViewBuilder
     private var bottomBar: some View {
+        if usesTrailingMacOSPlacement {
+            footnoteOnlyBar
+        } else {
+            fullBottomBar
+        }
+    }
+
+    @ViewBuilder
+    private var footnoteOnlyBar: some View {
+        if let footnote = configuration.footnote {
+            footnoteText(footnote)
+                .padding(.horizontal, metrics.actionHorizontalPadding)
+                .padding(.top, metrics.bottomBarVerticalPadding)
+                .padding(.bottom, actionBottomPadding)
+                .welcomeReveal(style: revealStyle, isVisible: isActionVisible, offset: 16, blur: 10, scale: 0.94)
+        }
+    }
+
+    private var fullBottomBar: some View {
         VStack(spacing: 10) {
             continueButton
 
             if let footnote = configuration.footnote {
-                footnote
-                    .text(bundle: configuration.localizationBundle, tableName: configuration.localizationTable)
-                    .font(.system(.footnote, design: resolvedFontDesign))
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
+                footnoteText(footnote)
             }
         }
         .welcomeAdaptiveActionWidth(isWide: capsActionWidth, maxWidth: metrics.actionMaxWidth)
@@ -216,15 +239,19 @@ public struct WelcomeView: View {
         .allowsHitTesting(isActionVisible && !isContinuing)
     }
 
+    private func footnoteText(_ footnote: WelcomeText) -> some View {
+        footnote
+            .text(bundle: configuration.localizationBundle, tableName: configuration.localizationTable)
+            .font(.system(.footnote, design: resolvedFontDesign))
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
     @ViewBuilder
     private var continueButton: some View {
         let label = continueLabel
-        let action = {
-            guard !isContinuing else { return }
-            isContinuing = true
-            mediumFeedback += 1
-            onContinue()
-        }
+        let action = performContinue
 
         switch configuration.buttonStyle {
         case .automatic:
@@ -264,6 +291,59 @@ public struct WelcomeView: View {
             .welcomeFlexibleLabelWidth()
     }
 
+    /// The button for macOS's ``WelcomeMacOSActionPlacement/trailing``
+    /// placement, floated in the window's bottom-trailing corner instead of
+    /// sitting in ``bottomBar``.
+    @ViewBuilder
+    private var trailingActionOverlay: some View {
+        if usesTrailingMacOSPlacement {
+            macOSTrailingContinueButton
+                .padding(22)
+                .welcomeReveal(style: revealStyle, isVisible: isActionVisible, offset: 16, blur: 10, scale: 0.94)
+                .allowsHitTesting(isActionVisible && !isContinuing)
+        }
+    }
+
+    /// The same corner-anchored grammar Setup Assistant and Migration
+    /// Assistant use. Unlike ``continueButton`` this ignores
+    /// ``WelcomeConfiguration/buttonStyle``: that grammar is a fixed look, not
+    /// a themeable one.
+    @ViewBuilder
+    private var macOSTrailingContinueButton: some View {
+        if #available(iOS 26.0, macOS 26.0, visionOS 26.0, *) {
+            Button(action: performContinue) { trailingContinueLabel }
+                .buttonStyle(.glassProminent)
+                .controlSize(.large)
+                .tint(resolvedAccentColor)
+                .keyboardShortcut(.defaultAction)
+        } else {
+            Button(action: performContinue) { trailingContinueLabel }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .welcomeGlassEffect(true)
+                .tint(resolvedAccentColor)
+                .keyboardShortcut(.defaultAction)
+        }
+    }
+
+    /// A fixed 13pt medium, not ``resolvedButtonFont``: this grammar is
+    /// borrowed whole from Setup Assistant and Migration Assistant, sized to
+    /// their compact corner button rather than to the rest of the screen.
+    private var trailingContinueLabel: some View {
+        configuration.continueTitle
+            .text(bundle: configuration.localizationBundle, tableName: configuration.localizationTable)
+            .font(.system(size: 13, weight: .medium))
+            .frame(minWidth: 105)
+            .padding(.vertical, 5)
+    }
+
+    private func performContinue() {
+        guard !isContinuing else { return }
+        isContinuing = true
+        mediumFeedback += 1
+        onContinue()
+    }
+
     // MARK: - Resolved values
 
     private var metrics: WelcomeMetrics { configuration.metrics }
@@ -283,6 +363,17 @@ public struct WelcomeView: View {
         true
         #else
         isWideLayout
+        #endif
+    }
+
+    /// macOS defaults to a compact button anchored in the window's corner,
+    /// the grammar of Setup Assistant and Migration Assistant. iOS and
+    /// visionOS always use the full-bleed bar.
+    private var usesTrailingMacOSPlacement: Bool {
+        #if os(macOS)
+        configuration.macOSActionPlacement == .trailing
+        #else
+        false
         #endif
     }
 

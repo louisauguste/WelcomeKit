@@ -120,6 +120,7 @@ configuration.footnote = "You can change this later in Settings."
 | `isHapticsEnabled` | A tap per row, a success note when the button lands. iOS only. |
 | `background` | `.automatic`, `.color(_:)`, `.gradient(_:)`, `.clear`. |
 | `buttonStyle` | `.automatic`, `.prominent`, `.glass`, `.bordered`. |
+| `macOSActionPlacement` | macOS only: `.trailing` (default) anchors a compact button to the window's bottom-trailing corner, `.fullWidth` keeps the centred bar every other platform uses. |
 | `continueTitle`, `footnote` | The copy. Localized keys by default. |
 | `maximumFeatureCount` | Show the first N rows of a longer list. |
 | `fontDesign` | `.default` (SF Pro), `.rounded`, `.serif` (New York), `.monospaced`. Applies to every font the package picks for itself. |
@@ -154,10 +155,12 @@ the top padding drops, because a sheet has no notch to clear. The check is a
 measured width *and* the iPad idiom, so an iPhone in landscape and an iPad in
 Slide Over both keep the phone numbers.
 
-**Mac** takes a 500×580 sheet with a 26pt title and 27pt symbols, caps the button
-at 300pt rather than iPad's 320, sets its label in 15pt medium instead of the
-smaller, heavier `.headline` a Mac resolves that to, and pads its own bottom,
-since there's no home indicator to sit above.
+**Mac** takes a 480×560 sheet with a 26pt title and 27pt symbols, sets its label
+in 15pt medium instead of the smaller, heavier `.headline` a Mac resolves that
+to, and by default anchors a compact button to the window's bottom-trailing
+corner — the same grammar as Setup Assistant and Migration Assistant — rather
+than the full-width bar every other platform uses. Set `macOSActionPlacement`
+to `.fullWidth` to keep the centred bar, capped at 300pt, instead.
 
 ## What it handles for you
 

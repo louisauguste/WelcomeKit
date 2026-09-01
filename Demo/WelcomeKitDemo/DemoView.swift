@@ -18,6 +18,9 @@ struct DemoView: View {
     @AppStorage("demo.tint") private var tint: DemoTint = .blue
     @AppStorage("demo.symbols") private var symbolRenderingMode: WelcomeSymbolRenderingMode = .monochrome
     @AppStorage("demo.button") private var buttonStyle: WelcomeButtonStyle = .automatic
+    #if os(macOS)
+    @AppStorage("demo.macOSActionPlacement") private var macOSActionPlacement: WelcomeMacOSActionPlacement = .trailing
+    #endif
     @AppStorage("demo.background") private var background: DemoBackground = .automatic
     @AppStorage("demo.font") private var fontDesign: WelcomeFontDesign = .default
     @AppStorage("demo.headline") private var headlineVariant: DemoHeadline = .plain
@@ -60,6 +63,13 @@ struct DemoView: View {
                             Text(style.rawValue.capitalized).tag(style)
                         }
                     }
+                    #if os(macOS)
+                    Picker("Button placement", selection: $macOSActionPlacement) {
+                        ForEach(WelcomeMacOSActionPlacement.allCases, id: \.self) { placement in
+                            Text(placement.name).tag(placement)
+                        }
+                    }
+                    #endif
                     Picker("Background", selection: $background) {
                         ForEach(DemoBackground.allCases, id: \.self) { background in
                             Text(background.name).tag(background)
@@ -147,6 +157,9 @@ struct DemoView: View {
         configuration.symbolRenderingMode = symbolRenderingMode
         configuration.symbolPalette = [tint.color, tint.color.opacity(0.35)]
         configuration.buttonStyle = buttonStyle
+        #if os(macOS)
+        configuration.macOSActionPlacement = macOSActionPlacement
+        #endif
         configuration.background = background.background
         configuration.fontDesign = fontDesign
         configuration.animation = WelcomeAnimation(style: revealStyle, speed: speed)
@@ -196,6 +209,17 @@ enum DemoHeadline: String, CaseIterable {
         }
     }
 }
+
+#if os(macOS)
+extension WelcomeMacOSActionPlacement {
+    var name: String {
+        switch self {
+        case .trailing: "Corner"
+        case .fullWidth: "Full width"
+        }
+    }
+}
+#endif
 
 extension WelcomeFontDesign {
     var name: String {

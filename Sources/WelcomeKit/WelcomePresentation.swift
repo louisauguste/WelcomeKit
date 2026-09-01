@@ -35,7 +35,7 @@ public struct WelcomePresentation: Sendable, Equatable {
     public init(
         style: Style = .sheet,
         isDismissible: Bool = false,
-        macOSSize: CGSize = CGSize(width: 500, height: 580)
+        macOSSize: CGSize = CGSize(width: 480, height: 560)
     ) {
         self.style = style
         self.isDismissible = isDismissible
