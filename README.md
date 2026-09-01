@@ -24,7 +24,7 @@ Xcode → File → Add Package Dependencies, then paste the repository URL. Or i
 `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/louisauguste/WelcomeKit.git", from: "1.2.0")
+.package(url: "https://github.com/louisauguste/WelcomeKit.git", from: "1.3.0")
 ```
 
 ## Use it
