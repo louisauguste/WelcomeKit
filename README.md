@@ -142,7 +142,7 @@ WelcomeFeature("Pro", subtitle: "Every model, no limits.",
 
 <p align="center">
   <img src="Screenshots/ipad-light.png" width="330" alt="iPad">
-  <img src="Screenshots/macos-dark.png" width="270" alt="macOS, dark">
+  <img src="Screenshots/macos-corner.png" width="330" alt="macOS, the button anchored in the window's corner">
 </p>
 
 **iPhone** gets the layout the design was drawn for: 42pt text margins, notch-sized
