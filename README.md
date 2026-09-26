@@ -24,7 +24,7 @@ Xcode → File → Add Package Dependencies, then paste the repository URL. Or i
 `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/louisauguste/WelcomeKit.git", from: "1.3.0")
+.package(url: "https://github.com/louisauguste/WelcomeKit.git", from: "1.4.0")
 ```
 
 ## Use it
@@ -97,6 +97,26 @@ Both lead lines are localized keys, so an app that already translates
 wording. The whole headline renders as a single `Text`: it wraps, it scales with
 Dynamic Type, and VoiceOver reads it in one go rather than as two stacked views.
 
+### Your app icon on top
+
+On iPhone and iPad, Apple's own welcome sheets put the app's icon above the
+headline. Hand WelcomeKit the image and it does the same:
+
+```swift
+var configuration = WelcomeConfiguration.default
+configuration.appIcon = Image("WelcomeIcon")
+configuration.titleAlignment = .center   // optional, the way Apple lays it out
+```
+
+It is off by default. Add the icon to your asset catalog as a regular image set
+with its rounded corners already in the artwork: WelcomeKit never clips it, only
+resizes it to 80pt, the size Apple's sheets use. The icon lines up with the
+headline and arrives with it. macOS ignores it.
+
+<p align="center">
+  <img src="Screenshots/iphone-appicon.png" width="200" alt="iPhone, the app icon above a centred headline">
+</p>
+
 ## Make it yours
 
 Everything hangs off one struct. Set what you care about, leave the rest.
@@ -122,6 +142,7 @@ configuration.footnote = "You can change this later in Settings."
 | `buttonStyle` | `.automatic`, `.prominent`, `.glass`, `.bordered`. |
 | `macOSActionPlacement` | macOS only: `.trailing` (default) anchors a compact button to the window's bottom-trailing corner, `.fullWidth` keeps the centred bar every other platform uses. |
 | `continueTitle`, `footnote` | The copy. Localized keys by default. |
+| `appIcon` | iOS and iPadOS: an image shown above the headline, drawn as given at 80pt. `nil` by default. |
 | `maximumFeatureCount` | Show the first N rows of a longer list. |
 | `fontDesign` | `.default` (SF Pro), `.rounded`, `.serif` (New York), `.monospaced`. Applies to every font the package picks for itself. |
 | `titleFont`, `featureTitleFont`, `featureSubtitleFont`, `buttonFont` | Fonts, if the defaults are not your defaults. A font you pass wins outright, `fontDesign` included. |
@@ -170,6 +191,15 @@ to `.fullWidth` to keep the centred bar, capped at 300pt, instead.
   yet, so nothing gets announced twice.
 - **Dynamic Type** works throughout, and the title shrinks rather than wrapping
   past two lines.
+- **Long lists** scroll under the button, not straight into it: the button
+  lives in a `safeAreaBar`, so on OS 26 the rows blur and fade as they pass
+  behind it, on the Mac's corner button too.
+
+<p align="center">
+  <img src="Screenshots/iphone-scroll.png" width="200" alt="iPhone, a long list blurring under the Continue button">
+  <img src="Screenshots/macos-scroll.png" width="330" alt="macOS, a long list blurring under the corner button">
+</p>
+
 - **Liquid Glass** on iOS 26 and macOS 26. Below that the button falls back to a
   bordered prominent one and the bottom bar to a `safeAreaInset` with a gradient,
   so nothing looks broken on iOS 17 or 18.
