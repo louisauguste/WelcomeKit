@@ -8,10 +8,14 @@
 #
 # Usage: Scripts/capture-screenshots.sh
 #
+#   OUT=/some/dir     write somewhere other than Screenshots/ — simctl cannot
+#                     write into a TCC-protected folder such as ~/Desktop
+#   SKIP_MACOS=1      iOS and iPadOS only
+#
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-OUT="$ROOT/Screenshots"
+OUT="${OUT:-$ROOT/Screenshots}"
 DERIVED="${TMPDIR:-/tmp}/WelcomeKitDemo-build"
 BUNDLE_ID="com.welcomekit.WelcomeKitDemo"
 
@@ -52,7 +56,7 @@ shoot () { # udid, name, appearance, extra launch args…
     python3 -c "import time; time.sleep(1)"   # let the appearance switch land
     xcrun simctl launch "$udid" "$BUNDLE_ID" \
         -demo.autoPresent YES -WelcomeKit.hasSeen.demo YES "$@" >/dev/null
-    python3 -c "import time; time.sleep(3.2)"   # let the reveal finish
+    python3 -c "import time; time.sleep(${SHOOT_WAIT:-3.2})"   # let the reveal finish
     xcrun simctl io "$udid" screenshot "$OUT/$name.png" >/dev/null 2>&1
     echo "  $name.png"
 }
@@ -63,6 +67,8 @@ shoot "$PHONE" iphone-light light  -demo.tint blue   -demo.symbols monochrome   
 shoot "$PHONE" iphone-dark  dark   -demo.tint indigo -demo.symbols hierarchical -demo.featureCount 5 -demo.headline plain    -demo.font default
 shoot "$PHONE" iphone-pink  light  -demo.tint pink   -demo.symbols hierarchical -demo.featureCount 4 -demo.headline plain    -demo.font default -demo.footnote YES
 shoot "$PHONE" iphone-whatsnew light -demo.tint indigo -demo.symbols monochrome -demo.featureCount 4 -demo.headline whatsNew -demo.font default
+shoot "$PHONE" iphone-appicon light -demo.tint blue -demo.symbols monochrome -demo.featureCount 4 -demo.headline plain -demo.font default -demo.appIcon YES -demo.titleAlignment center
+SHOOT_WAIT=6 shoot "$PHONE" iphone-scroll light -demo.tint blue -demo.symbols monochrome -demo.featureCount 9 -demo.headline plain -demo.font default
 
 echo "Capturing iPad…"
 prepare "$PAD"
@@ -85,6 +91,11 @@ wait $RECORDER 2>/dev/null || true
 # The recording opens on the home screen; the reveal itself starts once the
 # sheet is up, about 2.6s in.
 xcrun swift "$ROOT/Scripts/make-gif.swift" "$OUT/reveal.mov" "$OUT/reveal.gif" 300 15 2.62 2.9
+
+if [ -n "${SKIP_MACOS:-}" ]; then
+    echo "Done. Images are in $OUT"
+    exit 0
+fi
 
 echo "Capturing macOS…"
 # `screencapture` needs a Screen Recording permission a fresh checkout will not

@@ -43,6 +43,24 @@ enum DemoFeatures {
             "Swift 6, no dependencies",
             subtitle: "Strict concurrency on, third-party code out.",
             systemImage: "swift"
+        ),
+        WelcomeFeature(
+            id: "localized",
+            "Speaks your language",
+            subtitle: "Every string goes through your own string catalog.",
+            systemImage: "character.bubble.fill"
+        ),
+        WelcomeFeature(
+            id: "scrolls",
+            "Room for more",
+            subtitle: "A long list scrolls under the button, never behind it.",
+            systemImage: "list.bullet.rectangle.portrait.fill"
+        ),
+        WelcomeFeature(
+            id: "haptics",
+            "Felt, not just seen",
+            subtitle: "Each row lands with a tap you can feel.",
+            systemImage: "hand.tap.fill"
         )
     ]
 }

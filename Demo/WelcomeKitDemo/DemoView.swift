@@ -24,6 +24,10 @@ struct DemoView: View {
     @AppStorage("demo.background") private var background: DemoBackground = .automatic
     @AppStorage("demo.font") private var fontDesign: WelcomeFontDesign = .default
     @AppStorage("demo.headline") private var headlineVariant: DemoHeadline = .plain
+    @AppStorage("demo.titleAlignment") private var titleAlignment: DemoTitleAlignment = .leading
+    #if !os(macOS)
+    @AppStorage("demo.appIcon") private var showsAppIcon = false
+    #endif
 
     @AppStorage("demo.reveal") private var revealStyle: WelcomeRevealStyle = .blur
     @AppStorage("demo.speed") private var speed: Double = 1
@@ -105,6 +109,14 @@ struct DemoView: View {
                             Text(variant.name).tag(variant)
                         }
                     }
+                    Picker("Headline alignment", selection: $titleAlignment) {
+                        ForEach(DemoTitleAlignment.allCases, id: \.self) { alignment in
+                            Text(alignment.name).tag(alignment)
+                        }
+                    }
+                    #if !os(macOS)
+                    Toggle("App icon", isOn: $showsAppIcon)
+                    #endif
                     Stepper("Features: \(featureCount)", value: $featureCount, in: 1...DemoFeatures.all.count)
                     Toggle("Footnote", isOn: $showsFootnote)
                 }
@@ -162,6 +174,10 @@ struct DemoView: View {
         #endif
         configuration.background = background.background
         configuration.fontDesign = fontDesign
+        configuration.titleAlignment = titleAlignment.textAlignment
+        #if !os(macOS)
+        configuration.appIcon = showsAppIcon ? Image("WelcomeIcon") : nil
+        #endif
         configuration.animation = WelcomeAnimation(style: revealStyle, speed: speed)
         configuration.isHapticsEnabled = isHapticsEnabled
         configuration.footnote = showsFootnote ? "You can change any of this later in Settings." : nil
@@ -206,6 +222,19 @@ enum DemoHeadline: String, CaseIterable {
         case .plain: "Welcome to WelcomeKit"
         case .welcome: .welcome(to: "WelcomeKit")
         case .whatsNew: .whatsNew(in: "WelcomeKit")
+        }
+    }
+}
+
+enum DemoTitleAlignment: String, CaseIterable {
+    case leading, center
+
+    var name: String { rawValue.capitalized }
+
+    var textAlignment: TextAlignment {
+        switch self {
+        case .leading: .leading
+        case .center: .center
         }
     }
 }
