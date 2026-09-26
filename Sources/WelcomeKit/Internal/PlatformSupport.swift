@@ -122,9 +122,11 @@ private struct LegacyWideLayoutTracker: ViewModifier {
 // MARK: - OS 26 chrome
 
 extension View {
-    /// A bottom bar that the content scrolls under. `safeAreaBar` brings the
-    /// progressive blur with it on OS 26; below that a gradient stands in so
-    /// text never collides with the button.
+    /// A bottom bar that the content scrolls under. Attach it to the scroll
+    /// view. `safeAreaBar` brings the progressive blur with it on OS 26 — asked
+    /// for explicitly, because inside a sheet the automatic style draws
+    /// nothing; below that a gradient stands in so text never collides with
+    /// the button.
     @ViewBuilder
     func welcomeBottomBar<Bar: View>(
         fadeColor: Color?,
@@ -134,6 +136,7 @@ extension View {
             safeAreaBar(edge: .bottom, alignment: .center, spacing: 0) {
                 bar()
             }
+            .scrollEdgeEffectStyle(.soft, for: .bottom)
         } else {
             safeAreaInset(edge: .bottom, spacing: 0) {
                 bar().background {

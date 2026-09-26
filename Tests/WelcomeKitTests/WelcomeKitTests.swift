@@ -39,6 +39,14 @@ struct ConfigurationTests {
         #expect(WelcomeAnimation.speed(2).speed == 2)
     }
 
+    @Test("The app icon is opt-in, and sized like Apple's own sheets")
+    func appIcon() {
+        #if !os(macOS)
+        #expect(WelcomeConfiguration.default.appIcon == nil)
+        #endif
+        #expect(WelcomeMetrics().appIconSize == 80)
+    }
+
     @Test("Every cut of San Francisco is offered, SF Pro by default")
     func fontDesigns() {
         #expect(WelcomeConfiguration.default.fontDesign == .default)

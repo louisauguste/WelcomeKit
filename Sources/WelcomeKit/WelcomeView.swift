@@ -108,8 +108,13 @@ public struct WelcomeView: View {
         ZStack {
             background
 
+            // The bar hangs off the scroll view itself, not the stack around
+            // it: only a bar attached to the scroll view gets its edge effect,
+            // the blur the rows scroll under.
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
+                    appIconView
+
                     titleView
                         .padding(.bottom, metrics.titleBottomPadding)
 
@@ -126,12 +131,9 @@ public struct WelcomeView: View {
             }
             .scrollIndicators(.hidden)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        }
-        .welcomeBottomBar(fadeColor: backgroundFadeColor) {
-            bottomBar
-        }
-        .overlay(alignment: .bottomTrailing) {
-            trailingActionOverlay
+            .welcomeBottomBar(fadeColor: backgroundFadeColor) {
+                bottomBar
+            }
         }
         .welcomeTracksWideLayout($isWideLayout, threshold: metrics.wideWidthThreshold)
         .sensoryFeedback(trigger: mediumFeedback) { _, _ in
@@ -167,6 +169,25 @@ public struct WelcomeView: View {
         }
     }
 
+    /// The optional app icon above the headline. Drawn as given — the image
+    /// already carries its own corner shape — and only resized. It lines up
+    /// with the headline and arrives with it.
+    @ViewBuilder
+    private var appIconView: some View {
+        #if !os(macOS)
+        if let appIcon = configuration.appIcon {
+            appIcon
+                .resizable()
+                .scaledToFit()
+                .frame(width: metrics.appIconSize, height: metrics.appIconSize)
+                .frame(maxWidth: .infinity, alignment: titleFrameAlignment)
+                .padding(.bottom, metrics.appIconBottomPadding)
+                .accessibilityHidden(true)
+                .welcomeReveal(style: revealStyle, isVisible: isTitleVisible, offset: 14, blur: 18)
+        }
+        #endif
+    }
+
     private var titleView: some View {
         headline
             .text(
@@ -198,15 +219,18 @@ public struct WelcomeView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    /// On macOS's ``WelcomeMacOSActionPlacement/trailing`` placement the button
-    /// moves into ``trailingActionOverlay``, so this bar carries only the
-    /// footnote — still centred under the content, not following the button
-    /// into the corner. Every other configuration keeps the original combined
+    /// On macOS's ``WelcomeMacOSActionPlacement/trailing`` placement the
+    /// footnote stays centred under the content while the button sits in the
+    /// window's corner, both bottom-aligned in the same bar so the rows blur
+    /// under either. Every other configuration keeps the original combined
     /// bar.
     @ViewBuilder
     private var bottomBar: some View {
         if usesTrailingMacOSPlacement {
-            footnoteOnlyBar
+            ZStack(alignment: .bottom) {
+                footnoteOnlyBar
+                trailingActionBar
+            }
         } else {
             fullBottomBar
         }
@@ -292,16 +316,14 @@ public struct WelcomeView: View {
     }
 
     /// The button for macOS's ``WelcomeMacOSActionPlacement/trailing``
-    /// placement, floated in the window's bottom-trailing corner instead of
-    /// sitting in ``bottomBar``.
-    @ViewBuilder
-    private var trailingActionOverlay: some View {
-        if usesTrailingMacOSPlacement {
-            macOSTrailingContinueButton
-                .padding(22)
-                .welcomeReveal(style: revealStyle, isVisible: isActionVisible, offset: 16, blur: 10, scale: 0.94)
-                .allowsHitTesting(isActionVisible && !isContinuing)
-        }
+    /// placement, pushed into the window's bottom-trailing corner of
+    /// ``bottomBar``.
+    private var trailingActionBar: some View {
+        macOSTrailingContinueButton
+            .padding(22)
+            .welcomeReveal(style: revealStyle, isVisible: isActionVisible, offset: 16, blur: 10, scale: 0.94)
+            .allowsHitTesting(isActionVisible && !isContinuing)
+            .frame(maxWidth: .infinity, alignment: .trailing)
     }
 
     /// The same corner-anchored grammar Setup Assistant and Migration

@@ -89,6 +89,21 @@ public struct WelcomeConfiguration: @unchecked Sendable {
 
     // MARK: - Content
 
+    #if !os(macOS)
+    /// Your app's icon, shown above the headline the way Apple's own welcome
+    /// sheets do. `nil`, the default, leaves it out. iOS, iPadOS and visionOS
+    /// only.
+    ///
+    /// Supply the finished artwork — an image in your asset catalog with its
+    /// rounded corners already baked in. WelcomeKit draws it as it is and only
+    /// resizes it, to ``WelcomeMetrics/appIconSize``.
+    ///
+    /// ```swift
+    /// configuration.appIcon = Image("WelcomeIcon")
+    /// ```
+    public var appIcon: Image? = nil
+    #endif
+
     /// Caps how many rows are shown, ignoring the rest. `nil` shows them all.
     ///
     /// Handy when the same feature list feeds several surfaces and the welcome
@@ -399,6 +414,13 @@ public struct WelcomeMetrics: Sendable, Equatable {
     /// Height of the symbol gutter.
     public var symbolColumnHeight: CGFloat
 
+    /// Side of the square ``WelcomeConfiguration/appIcon`` is drawn in. 80pt
+    /// matches Apple's own welcome sheets. Unused on macOS.
+    public var appIconSize: CGFloat
+
+    /// Gap between the app icon and the headline. Unused on macOS.
+    public var appIconBottomPadding: CGFloat
+
     public init(
         wideWidthThreshold: CGFloat = 500,
         actionMaxWidth: CGFloat = 320,
@@ -416,7 +438,9 @@ public struct WelcomeMetrics: Sendable, Equatable {
         featureSpacing: CGFloat = 20,
         symbolSpacing: CGFloat = 12,
         symbolColumnWidth: CGFloat = 42,
-        symbolColumnHeight: CGFloat = 34
+        symbolColumnHeight: CGFloat = 34,
+        appIconSize: CGFloat = 80,
+        appIconBottomPadding: CGFloat = 34
     ) {
         self.wideWidthThreshold = wideWidthThreshold
         self.actionMaxWidth = actionMaxWidth
@@ -435,6 +459,8 @@ public struct WelcomeMetrics: Sendable, Equatable {
         self.symbolSpacing = symbolSpacing
         self.symbolColumnWidth = symbolColumnWidth
         self.symbolColumnHeight = symbolColumnHeight
+        self.appIconSize = appIconSize
+        self.appIconBottomPadding = appIconBottomPadding
     }
 
     /// Platform defaults: the iOS numbers, or the tighter macOS ones inside a
