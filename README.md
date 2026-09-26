@@ -24,7 +24,7 @@ Xcode → File → Add Package Dependencies, then paste the repository URL. Or i
 `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/louisauguste/WelcomeKit.git", from: "1.4.0")
+.package(url: "https://github.com/louisauguste/WelcomeKit.git", from: "1.5.0")
 ```
 
 ## Use it
@@ -106,12 +106,14 @@ headline. Hand WelcomeKit the image and it does the same:
 var configuration = WelcomeConfiguration.default
 configuration.appIcon = Image("WelcomeIcon")
 configuration.titleAlignment = .center   // optional, the way Apple lays it out
+configuration.appIconAlignment = .center // optional, centres the icon alone
 ```
 
 It is off by default. Add the icon to your asset catalog as a regular image set
 with its rounded corners already in the artwork: WelcomeKit never clips it, only
 resizes it to 80pt, the size Apple's sheets use. The icon lines up with the
-headline and arrives with it. macOS ignores it.
+headline, or wherever `appIconAlignment` puts it, and arrives with it. macOS
+ignores it.
 
 <p align="center">
   <img src="Screenshots/iphone-appicon.png" width="200" alt="iPhone, the app icon above a centred headline">
@@ -143,6 +145,7 @@ configuration.footnote = "You can change this later in Settings."
 | `macOSActionPlacement` | macOS only: `.trailing` (default) anchors a compact button to the window's bottom-trailing corner, `.fullWidth` keeps the centred bar every other platform uses. |
 | `continueTitle`, `footnote` | The copy. Localized keys by default. |
 | `appIcon` | iOS and iPadOS: an image shown above the headline, drawn as given at 80pt. `nil` by default. |
+| `appIconAlignment` | iOS and iPadOS: where the icon sits across the width. `nil` follows `titleAlignment`. |
 | `maximumFeatureCount` | Show the first N rows of a longer list. |
 | `fontDesign` | `.default` (SF Pro), `.rounded`, `.serif` (New York), `.monospaced`. Applies to every font the package picks for itself. |
 | `titleFont`, `featureTitleFont`, `featureSubtitleFont`, `buttonFont` | Fonts, if the defaults are not your defaults. A font you pass wins outright, `fontDesign` included. |

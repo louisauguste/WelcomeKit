@@ -180,7 +180,7 @@ public struct WelcomeView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: metrics.appIconSize, height: metrics.appIconSize)
-                .frame(maxWidth: .infinity, alignment: titleFrameAlignment)
+                .frame(maxWidth: .infinity, alignment: appIconFrameAlignment)
                 .padding(.bottom, metrics.appIconBottomPadding)
                 .accessibilityHidden(true)
                 .welcomeReveal(style: revealStyle, isVisible: isTitleVisible, offset: 14, blur: 18)
@@ -416,7 +416,17 @@ public struct WelcomeView: View {
     }
 
     private var titleFrameAlignment: Alignment {
-        switch configuration.titleAlignment {
+        Self.frameAlignment(configuration.titleAlignment)
+    }
+
+    #if !os(macOS)
+    private var appIconFrameAlignment: Alignment {
+        Self.frameAlignment(configuration.appIconAlignment ?? configuration.titleAlignment)
+    }
+    #endif
+
+    private static func frameAlignment(_ alignment: TextAlignment) -> Alignment {
+        switch alignment {
         case .center: .center
         case .trailing: .trailing
         case .leading: .leading

@@ -102,6 +102,14 @@ public struct WelcomeConfiguration: @unchecked Sendable {
     /// configuration.appIcon = Image("WelcomeIcon")
     /// ```
     public var appIcon: Image? = nil
+
+    /// Where ``appIcon`` sits across the width. `nil`, the default, follows
+    /// ``titleAlignment``; set it to centre the icon over a leading headline.
+    ///
+    /// ```swift
+    /// configuration.appIconAlignment = .center
+    /// ```
+    public var appIconAlignment: TextAlignment? = nil
     #endif
 
     /// Caps how many rows are shown, ignoring the rest. `nil` shows them all.
