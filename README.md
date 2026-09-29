@@ -1,6 +1,6 @@
 # WelcomeKit
 
-[![CI](https://github.com/louisauguste/WelcomeKit/actions/workflows/ci.yml/badge.svg)](https://github.com/louisauguste/WelcomeKit/actions/workflows/ci.yml)
+[![CI](https://github.com/atoll-studio/WelcomeKit/actions/workflows/ci.yml/badge.svg)](https://github.com/atoll-studio/WelcomeKit/actions/workflows/ci.yml)
 
 The "Welcome to…" screen Apple opens its own apps with, as a Swift package. A big
 title, a list of features with SF Symbols beside them, a button pinned to the
@@ -24,7 +24,7 @@ Xcode → File → Add Package Dependencies, then paste the repository URL. Or i
 `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/louisauguste/WelcomeKit.git", from: "1.5.0")
+.package(url: "https://github.com/atoll-studio/WelcomeKit.git", from: "1.5.0")
 ```
 
 ## Use it
